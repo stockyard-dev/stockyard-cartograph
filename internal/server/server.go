@@ -1,7 +1,7 @@
 package server
 import ("encoding/json";"log";"net/http";"github.com/stockyard-dev/stockyard-cartograph/internal/store")
-type Server struct{db *store.DB;mux *http.ServeMux}
-func New(db *store.DB)*Server{s:=&Server{db:db,mux:http.NewServeMux()}
+type Server struct{db *store.DB;mux *http.ServeMux;limits Limits}
+func New(db *store.DB,limits Limits)*Server{s:=&Server{db:db,mux:http.NewServeMux(),limits:limits}
 s.mux.HandleFunc("GET /api/sites",s.listSites);s.mux.HandleFunc("POST /api/sites",s.createSite);s.mux.HandleFunc("GET /api/sites/{id}",s.getSite);s.mux.HandleFunc("DELETE /api/sites/{id}",s.deleteSite)
 s.mux.HandleFunc("GET /api/sites/{id}/urls",s.listURLs);s.mux.HandleFunc("POST /api/sites/{id}/urls",s.addURL);s.mux.HandleFunc("DELETE /api/urls/{id}",s.deleteURL)
 s.mux.HandleFunc("GET /api/sites/{id}/sitemap.xml",s.generateXML)
