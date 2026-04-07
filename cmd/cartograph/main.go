@@ -1,16 +1,19 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	"github.com/stockyard-dev/stockyard-cartograph/internal/server"
+	"github.com/stockyard-dev/stockyard-cartograph/internal/store"
 	"log"
 	"net/http"
 	"os"
-
-	"github.com/stockyard-dev/stockyard-cartograph/internal/server"
-	"github.com/stockyard-dev/stockyard-cartograph/internal/store"
 )
 
 func main() {
+	portFlag := flag.String("port", "", "")
+	dataFlag := flag.String("data", "", "")
+	flag.Parse()
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "9230"
@@ -20,13 +23,19 @@ func main() {
 		dataDir = "./cartograph-data"
 	}
 
+	if *portFlag != "" {
+		port = *portFlag
+	}
+	if *dataFlag != "" {
+		dataDir = *dataFlag
+	}
 	db, err := store.Open(dataDir)
 	if err != nil {
 		log.Fatalf("cartograph: open database: %v", err)
 	}
 	defer db.Close()
 
-	srv := server.New(db, server.DefaultLimits())
+	srv := server.New(db, server.DefaultLimits(), dataDir)
 
 	fmt.Printf("\n  Cartograph — Self-hosted sitemap generator\n")
 	fmt.Printf("  Questions? hello@stockyard.dev\n")
